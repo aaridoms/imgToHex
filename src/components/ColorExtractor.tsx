@@ -4,11 +4,14 @@ import { Tooltip } from "react-tooltip";
 import useClipboard from "../hooks/useClipboard";
 import useImageUploader from "../hooks/useImageUploader";
 import useColorExtraction from "../hooks/useColorExtraction";
+// import useColorPalette from "../hooks/useColorPalette";
 
 const ColorExtractor: React.FC = () => {
   const { imgRef, handleImageUpload } = useImageUploader()
   const { colors, extractColors } = useColorExtraction(imgRef)
   const { copyToClipboard } = useClipboard()
+  // const { palette, generatePalette } = useColorPalette()
+  // const [ selectedColor, setSelectedColor ] = useState<string | null>(null)
 
   return (
     <div className="p-4 flex flex-col items-center justify-center h-screen">
