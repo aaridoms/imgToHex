@@ -1,64 +1,14 @@
-import React, { useState, useRef } from "react";
-// @ts-expect-error no tengo los tipos para colorthief
-import ColorThief from "colorthief/dist/color-thief.mjs";
-import toast, { Toaster } from "react-hot-toast";
+import React from "react";
+import { Toaster } from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
+import useClipboard from "../hooks/useClipboard";
+import useImageUploader from "../hooks/useImageUploader";
+import useColorExtraction from "../hooks/useColorExtraction";
 
 const ColorExtractor: React.FC = () => {
-  const [colors, setColors] = useState<string[]>([]);
-  const imgRef = useRef<HTMLImageElement | null>(null);
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        if (imgRef.current && e.target) {
-          imgRef.current.src = e.target.result as string;
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const extractColors = () => {
-    const img = imgRef.current;
-    if (img && img.complete) {
-      const colorThief = new ColorThief();
-      const palette = colorThief.getPalette(img, 6) as [
-        number,
-        number,
-        number
-      ][];
-      setColors(palette.map(rgbToHex));
-    }
-  };
-
-  const rgbToHex = ([r, g, b]: [number, number, number]): string => {
-    return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
-  };
-
-  const copyToClipboard = (color: string) => {
-    navigator.clipboard
-      .writeText(color)
-      .then(() => {
-        toast.success(
-          <span style={{ color: color, fontWeight: "bold" }}>
-            Color {color} copiado al portapapeles
-          </span>,
-          {
-            icon: "🎨",
-            style: {
-              borderRadius: "10px",
-              background: "#c3c3c3",
-            },
-          }
-        );
-      })
-      .catch((err) => {
-        console.error("Error al copiar el color: ", err);
-      });
-  };
+  const { imgRef, handleImageUpload } = useImageUploader()
+  const { colors, extractColors } = useColorExtraction(imgRef)
+  const { copyToClipboard } = useClipboard()
 
   return (
     <div className="p-4 flex flex-col items-center justify-center h-screen">
